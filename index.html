@@ -163,13 +163,13 @@ body { margin: 0; }
     <div class="facts">
       <div><span class="mono">Statuut</span><b>Student-zelfstandige</b></div>
       <div><span class="mono">Werkgebied</span><b>Pajottegem en omstreken</b></div>
-      <div><span class="mono">Tarief</span><b>€ 25 per uur</b><span class="mono">Btw medecontractant</span></div>
+      <div><span class="mono">Tarief</span><b>€ 22 per uur</b><span class="mono">Btw medecontractant</span></div>
     </div>
   </div>
 
   <section id="diensten">
     <h2>Waarvoor je me inzet</h2>
-    <p class="sub">Uitvoerend tuinwerk op jouw werf, volgens jouw instructies en planning. Mijn sterkste punt is onderhoud. Aanleg doe ik ook, maar daar heb ik minder ervaring mee. Alles aan € 25 per uur.</p>
+    <p class="sub">Uitvoerend tuinwerk op jouw werf, volgens jouw instructies en planning. Mijn sterkste punt is onderhoud. Aanleg doe ik ook, maar daar heb ik minder ervaring mee. Alles aan € 22 per uur.</p>
     <div class="rows">
       <div class="row"><h3>Onderhoud</h3><p>Onkruid wieden, bladeren ruimen, gazon maaien, kanten afsteken en verticuteren, terrassen en paden netjes maken.</p></div>
       <div class="row"><h3>Snoeien</h3><p>Heggen, struiken en fruitbomen in vorm brengen, snoeiafval opruimen.</p></div>
@@ -189,7 +189,7 @@ body { margin: 0; }
 
   <section id="boeken">
     <h2>Agenda en werkbon</h2>
-    <p class="sub">Ik ben regelmatig beschikbaar in de week, vooral op woensdag, donderdag en vrijdag, en ook in het weekend. Kies hieronder een vrije dag in de agenda. Staat jouw dag er niet bij, stuur me dan een berichtje op WhatsApp.</p>
+    <p class="sub">Ik ben regelmatig beschikbaar in de week, vooral op woensdag, donderdag en vrijdag, en ook op zaterdag. Kies hieronder een vrije dag in de agenda. Staat jouw dag er niet bij, stuur me dan een berichtje op WhatsApp.</p>
 
     <div class="agenda" id="agenda">
       <div class="ag-head">
@@ -204,7 +204,7 @@ body { margin: 0; }
         <span><i class="sw sel"></i> Jouw keuze</span>
       </div>
     </div>
-    <script type="application/json" id="agendaData">{"blocked": []}</script>
+    <script type="application/json" id="agendaData">{"blocked": ["2026-11-19", "2026-11-26"]}</script>
 
     <div class="bon" id="bon">
       <div class="bon-head"><span class="mono">Aanvraag inboeken</span><span class="mono" id="bonDate"></span></div>
@@ -263,7 +263,7 @@ body { margin: 0; }
 
   <footer>
     <span>AA-Tuinservice · Aaron Annendijck · Student-zelfstandige tuinman · BE 1041.543.042</span>
-    <span>€ 25 per uur · Pajottegem en omstreken</span>
+    <span>€ 22 per uur · Pajottegem en omstreken</span>
   </footer>
 </div>
 
@@ -275,7 +275,7 @@ body { margin: 0; }
   var iso = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
   var AG = { blocked: [] };
   try { AG = JSON.parse($("agendaData").textContent); } catch (e) {}
-  var OPEN_DAYS = [0, 3, 4, 5, 6];
+  var OPEN_DAYS = [3, 4, 5, 6];
   var selectedISO = "";
   var now = new Date();
   var view = { y: now.getFullYear(), m: now.getMonth() };
@@ -316,7 +316,7 @@ body { margin: 0; }
   renderAgenda();
   function updateEst() {
     var h = parseFloat($("duur").value);
-    $("est").textContent = h > 0 ? "Richtprijs: € " + (h * 25).toLocaleString("nl-BE", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + " (btw medecontractant)" : "";
+    $("est").textContent = h > 0 ? "Richtprijs: € " + (h * 22).toLocaleString("nl-BE", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + " (btw medecontractant)" : "";
   }
   $("duur").addEventListener("input", updateEst);
   updateEst();
@@ -326,7 +326,7 @@ body { margin: 0; }
   function summary(d, ref) {
     return "Referentie: " + ref + "\n" +
       "Bedrijf: " + d.bedrijf + "\nContact: " + d.contact + " (" + d.tel + ", " + d.mail + ")\n" +
-      "Datum: " + d.datum + " om " + d.start + "\nDuur: " + d.duur + " uur (€ 25 per uur)\nWerf: " + d.werf + "\n" +
+      "Datum: " + d.datum + " om " + d.start + "\nDuur: " + d.duur + " uur (€ 22 per uur)\nWerf: " + d.werf + "\n" +
       "Werk: " + (d.werk.length ? d.werk.join(", ") : "niet opgegeven") + "\n" +
       "Opmerkingen: " + (d.opm || "geen");
   }
