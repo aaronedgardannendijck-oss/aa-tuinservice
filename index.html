@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AA-Tuinservice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: één pagina in de stijl van een werkbon. Brede kop, diensten als regels met eenheid, boekingsformulier als bon. */
+:root {
+  --bg: #EDF0EA;
+  --surface: #F8FAF6;
+  --fg: #16221B;
+  --muted: #5A685F;
+  --line: #C9D1C6;
+  --accent: #1F4D36;
+  --green: #2E9B4E;
+  --signal: #D4E34A;
+  --on-signal: #16221B;
+  --on-accent: #F3F6EF;
+  --err: #A63A25;
+  --font-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1712; --surface: #17211B; --fg: #E8EEE4; --muted: #94A399; --line: #2B3A30;
+    --accent: #8DCB9F; --green: #4FD170; --signal: #D4E34A; --on-signal: #16221B; --on-accent: #0F1712; --err: #F08A74;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1712; --surface: #17211B; --fg: #E8EEE4; --muted: #94A399; --line: #2B3A30;
+  --accent: #8DCB9F; --green: #4FD170; --signal: #D4E34A; --on-signal: #16221B; --on-accent: #0F1712; --err: #F08A74;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-block: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); font-stretch: 112%; text-wrap: balance; margin: 0; line-height: 1.02; }
+.mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--signal); outline-offset: 2px; }
+:root[data-theme="light"] :focus-visible, :root:not([data-theme]) :focus-visible { outline-color: var(--accent); }
+
+/* top bar */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-block: 20px; border-bottom: 2px solid var(--fg); flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-stretch: 112%; font-weight: 800; font-size: 18px; letter-spacing: -.01em; display: flex; align-items: center; gap: 12px; }
+.logo { font-family: var(--font-display); font-stretch: 125%; font-weight: 900; font-size: 30px; letter-spacing: -.08em; line-height: 1; }
+.ga { color: var(--green); }
+.ba { color: var(--fg); }
+.monogram { font-family: var(--font-display); font-stretch: 125%; font-weight: 900; font-size: clamp(7rem, 26vw, 15rem); letter-spacing: -.08em; line-height: .8; margin: 0 0 0 -.04em; user-select: none; }
+.hero-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+.est { font-family: var(--font-mono); font-size: 14px; margin: 0; color: var(--fg); }
+.top a.cta { background: var(--fg); color: var(--bg); text-decoration: none; font-weight: 600; font-size: 14px; padding: 9px 16px; }
+
+/* hero */
+.hero { padding-block: clamp(40px, 8vw, 88px) clamp(32px, 6vw, 56px); display: grid; gap: 28px; }
+.hero h1 { font-weight: 900; font-size: clamp(2.6rem, 9vw, 6.2rem); letter-spacing: -.035em; }
+.hero h1 mark { background: var(--signal); color: var(--on-signal); padding: 0 .12em; }
+.hero p.lead { max-width: 56ch; font-size: clamp(1.05rem, 2.2vw, 1.25rem); margin: 0; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); border-top: 1px solid var(--line); }
+.facts div { padding: 16px 16px 16px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.facts b { display: block; font-family: var(--font-display); font-stretch: 112%; font-size: 1.5rem; font-weight: 800; line-height: 1.15; }
+
+section { padding-block: clamp(36px, 6vw, 64px); border-top: 2px solid var(--fg); }
+section > h2 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px; }
+section > p.sub { color: var(--muted); max-width: 60ch; margin: 0 0 28px; }
+
+/* services */
+.rows { border-top: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) auto; /* derde kolom alleen gebruikt door de WhatsApp-knop */ gap: 8px 24px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.row h3 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; }
+.row p { margin: 0; color: var(--muted); }
+.row .mono { white-space: nowrap; }
+@media (max-width: 640px) { .row { grid-template-columns: 1fr; } }
+
+/* steps */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0; border-left: 1px solid var(--line); }
+.step { padding: 4px 20px 8px; border-right: 1px solid var(--line); min-width: 0; }
+.step h3 { font-size: 1.15rem; font-weight: 700; margin: 6px 0 6px; }
+.step p { margin: 0; color: var(--muted); }
+
+/* work order form */
+.bon { background: var(--surface); border: 2px solid var(--fg); }
+.bon-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--fg); color: var(--bg); padding: 12px 20px; }
+.bon-head .mono { color: inherit; }
+form { display: grid; gap: 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.field { padding: 14px 20px 16px; border-bottom: 1px solid var(--line); display: grid; gap: 6px; min-width: 0; align-content: start; }
+.grid .field:nth-child(odd) { border-right: 1px solid var(--line); }
+.full { grid-column: 1 / -1; border-right: 0 !important; }
+@media (max-width: 640px) { .grid { grid-template-columns: 1fr; } .grid .field:nth-child(odd) { border-right: 0; } }
+label, legend { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0; }
+input[type=text], input[type=tel], input[type=email], input[type=date], input[type=time], input[type=number], select, textarea {
+  width: 100%; font: inherit; font-size: 16px; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 0; padding: 10px 12px; min-width: 0;
+}
+textarea { min-height: 96px; resize: vertical; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px 16px; margin-top: 8px; }
+.check { display: flex; gap: 10px; align-items: center; font-family: var(--font-body); font-size: 16px; text-transform: none; letter-spacing: 0; color: var(--fg); }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; margin: 0; }
+.bon-foot { padding: 18px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: space-between; }
+button.send { background: var(--signal); color: var(--on-signal); border: 2px solid var(--fg); font: inherit; font-weight: 700; padding: 12px 24px; cursor: pointer; font-size: 16px; }
+button.send:hover { background: var(--fg); color: var(--signal); }
+button.send[disabled] { opacity: .6; cursor: wait; }
+button.ghost { background: transparent; color: var(--fg); border: 1px solid var(--fg); font: inherit; padding: 9px 16px; cursor: pointer; }
+.msg { margin: 0; font-size: 14px; color: var(--muted); max-width: 52ch; }
+.err { color: var(--err); font-weight: 500; font-size: 14px; margin: 0; }
+.done { padding: 28px 20px; display: grid; gap: 14px; }
+.done h3 { font-size: 1.8rem; font-weight: 800; }
+.ref { font-family: var(--font-mono); background: var(--bg); border: 1px dashed var(--fg); padding: 12px 14px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; }
+
+.agenda { border: 2px solid var(--fg); background: var(--surface); padding: 16px 20px 20px; margin-bottom: 28px; }
+.ag-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.ag-head h3 { font-size: 1.3rem; font-weight: 800; text-transform: capitalize; }
+.ag-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.ag-dow { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: center; padding-bottom: 4px; }
+.ag-day { font: inherit; font-size: 15px; font-variant-numeric: tabular-nums; aspect-ratio: 1.15; max-width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--fg); display: grid; place-items: center; padding: 0; border-radius: 0; }
+.ag-day.free { border-color: var(--accent); background: var(--surface); cursor: pointer; font-weight: 600; }
+.ag-day.free:hover { background: var(--signal); color: var(--on-signal); border-color: var(--fg); }
+.ag-day.busy { color: var(--muted); opacity: .55; background: repeating-linear-gradient(135deg, transparent 0 5px, var(--line) 5px 6px); cursor: not-allowed; }
+.ag-day.sel { background: var(--fg); color: var(--bg); border-color: var(--fg); font-weight: 700; }
+.ag-blank { visibility: hidden; }
+.ag-legend { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-top: 14px; font-size: 14px; color: var(--muted); }
+.ag-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 16px; height: 16px; border: 1px solid var(--line); display: inline-block; }
+.sw.free { border-color: var(--accent); background: var(--surface); }
+.sw.busy { background: repeating-linear-gradient(135deg, transparent 0 4px, var(--line) 4px 5px); }
+.sw.sel { background: var(--fg); border-color: var(--fg); }
+a.wa { background: var(--signal); color: var(--on-signal); border: 2px solid var(--fg); font-weight: 600; font-size: 14px; padding: 8px 14px; text-decoration: none; white-space: nowrap; }
+.facts div .mono { display: block; margin-top: 2px; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+a.wa.big { font-size: 16px; padding: 12px 22px; }
+footer { border-top: 2px solid var(--fg); padding-block: 24px 40px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+body { margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <span class="brand"><span class="logo"><span class="ga">A</span><span class="ba">A</span></span> AA-Tuinservice</span>
+    <a class="cta" href="#boeken">Bekijk agenda &amp; boek in</a>
+  </header>
+
+  <div class="hero">
+    <div class="hero-top">
+      <span class="mono">Student-zelfstandige · 19 jaar</span>
+      <div class="monogram" aria-hidden="true"><span class="ga">A</span><span class="ba">A</span></div>
+    </div>
+    <h1>Extra handen voor <mark>jouw werven.</mark></h1>
+    <p class="lead">Ik heb als student ervaring opgedaan als tuinman en bied me nu zelfstandig aan voor tuinaannemers in Pajottegem en omstreken. Zit je in een drukke periode, ontbreekt er een collega of loopt een werf uit? Boek me per uur.</p>
+    <div class="facts">
+      <div><span class="mono">Statuut</span><b>Student-zelfstandige</b></div>
+      <div><span class="mono">Werkgebied</span><b>Pajottegem en omstreken</b></div>
+      <div><span class="mono">Tarief</span><b>€ 25 per uur</b><span class="mono">Btw medecontractant</span></div>
+    </div>
+  </div>
+
+  <section id="diensten">
+    <h2>Waarvoor je me inzet</h2>
+    <p class="sub">Uitvoerend tuinwerk op jouw werf, volgens jouw instructies en planning. Mijn sterkste punt is onderhoud. Aanleg doe ik ook, maar daar heb ik minder ervaring mee. Alles aan € 25 per uur.</p>
+    <div class="rows">
+      <div class="row"><h3>Onderhoud</h3><p>Onkruid wieden, bladeren ruimen, gazon maaien, kanten afsteken en verticuteren, terrassen en paden netjes maken.</p></div>
+      <div class="row"><h3>Snoeien</h3><p>Heggen, struiken en fruitbomen in vorm brengen, snoeiafval opruimen.</p></div>
+      <div class="row"><h3>Beplanting en aanleg</h3><p>Planten en struiken plaatsen, helpen bij aanleg onder begeleiding van jouw ploegbaas.</p></div>
+    </div>
+  </section>
+
+  <section id="werkwijze">
+    <h2>Zo boek je mij</h2>
+    <p class="sub">Simple comme bonjour! Je kiest een vrije dag in de agenda, vult de werkbon in en ik bevestig je aanvraag.</p>
+    <div class="steps">
+      <div class="step"><span class="mono">Stap 1</span><h3>Kies een dag</h3><p>Kies een vrije dag, het aantal uren, de werf en het soort werk. Meer heb ik niet nodig.</p></div>
+      <div class="step"><span class="mono">Stap 2</span><h3>Ik bevestig</h3><p>Ik controleer mijn planning rond mijn studies en laat je weten of het past.</p></div>
+      <div class="step"><span class="mono">Stap 3</span><h3>Ik sta op de werf</h3><p>Op tijd en in werkkledij. Gereedschap, machines en materiaal voorzie jij.</p></div>
+    </div>
+  </section>
+
+  <section id="boeken">
+    <h2>Agenda en werkbon</h2>
+    <p class="sub">Ik ben regelmatig beschikbaar in de week, vooral op woensdag, donderdag en vrijdag, en ook in het weekend. Kies hieronder een vrije dag in de agenda. Staat jouw dag er niet bij, stuur me dan een berichtje op WhatsApp.</p>
+
+    <div class="agenda" id="agenda">
+      <div class="ag-head">
+        <button type="button" class="ghost" id="prevM" aria-label="Vorige maand">&larr;</button>
+        <h3 id="monthName" aria-live="polite"></h3>
+        <button type="button" class="ghost" id="nextM" aria-label="Volgende maand">&rarr;</button>
+      </div>
+      <div class="ag-grid" id="agGrid"></div>
+      <div class="ag-legend">
+        <span><i class="sw free"></i> Vrij, klik om te kiezen</span>
+        <span><i class="sw busy"></i> Niet beschikbaar</span>
+        <span><i class="sw sel"></i> Jouw keuze</span>
+      </div>
+    </div>
+    <script type="application/json" id="agendaData">{"blocked": []}</script>
+
+    <div class="bon" id="bon">
+      <div class="bon-head"><span class="mono">Aanvraag inboeken</span><span class="mono" id="bonDate"></span></div>
+      <form id="form" novalidate>
+        <div class="grid">
+          <div class="field"><label for="bedrijf">Bedrijf</label><input type="text" id="bedrijf" name="bedrijf" autocomplete="organization" required></div>
+          <div class="field"><label for="contact">Contactpersoon</label><input type="text" id="contact" name="contact" autocomplete="name" required></div>
+          <div class="field"><label for="tel">Telefoon</label><input type="tel" id="tel" name="tel" autocomplete="tel" required></div>
+          <div class="field"><label for="mail">E-mail</label><input type="email" id="mail" name="mail" autocomplete="email" required></div>
+          <div class="field"><label for="datum">Datum</label><input type="text" id="datum" name="datum" readonly placeholder="Kies een vrije dag in de agenda" required></div>
+          <div class="field"><label for="start">Aanvang</label><input type="time" id="start" name="start" value="08:00" required></div>
+          <div class="field"><label for="duur">Aantal uren</label>
+            <input type="number" id="duur" name="duur" min="1" max="80" step="0.5" value="8" required>
+            <p class="est" id="est"></p></div>
+          <div class="field"><label for="werf">Plaats van de werf</label><input type="text" id="werf" name="werf" placeholder="Gemeente of adres" required></div>
+          <fieldset class="field full">
+            <legend>Soort werk</legend>
+            <div class="checks">
+              <label class="check"><input type="checkbox" name="werk" value="Onderhoud"> Onderhoud</label>
+              <label class="check"><input type="checkbox" name="werk" value="Snoeien"> Snoeien</label>
+              <label class="check"><input type="checkbox" name="werk" value="Beplanting en aanleg"> Beplanting en aanleg</label>
+              <label class="check"><input type="checkbox" name="werk" value="Ander werk"> Ander werk</label>
+            </div>
+          </fieldset>
+          <div class="field full"><label for="opm">Opmerkingen</label><textarea id="opm" name="opm" placeholder="Bijvoorbeeld: toegang tot de werf, beschikbaar gereedschap, aanspreekpunt ter plaatse"></textarea></div>
+        </div>
+        <div class="bon-foot">
+          <p class="msg" id="status">Je vult de gegevens in en verstuurt ze daarna via WhatsApp. Ik bevestig zo snel mogelijk.</p>
+          <button class="send" type="submit" id="send">Verder naar WhatsApp</button>
+        </div>
+      </form>
+      <div class="done" id="done" hidden>
+        <span class="mono">Bijna klaar</span>
+        <h3>Verstuur je aanvraag via WhatsApp.</h3>
+        <p style="margin:0">Druk op de knop. WhatsApp opent met je aanvraag al ingevuld. Je aanvraag is pas verstuurd als je daar op verzenden drukt. Daarna bevestig ik zo snel mogelijk.</p>
+        <div class="ref" id="ref"></div>
+        <div class="actions">
+          <a class="wa big" id="waSend" href="https://wa.me/32474183457" target="_blank" rel="noopener">Verstuur via WhatsApp</a>
+          <button class="ghost" type="button" id="copyBtn">Kopieer aanvraag</button>
+          <button class="ghost" type="button" id="again">Aanvraag aanpassen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact en bedrijfsgegevens</h2>
+    <p class="sub">Liever meteen overleggen? Stuur me een bericht op WhatsApp.</p>
+    <div class="rows">
+      <div class="row"><h3>Naam</h3><p>Aaron Annendijck</p><span class="mono"></span></div>
+      <div class="row"><h3>Gsm</h3><p>+32 474 18 34 57</p><a class="wa" href="https://wa.me/32474183457">Stuur een WhatsApp</a></div>
+      <div class="row"><h3>Regio</h3><p>Pajottegem en omstreken</p><span class="mono"></span></div>
+      <div class="row"><h3>Ondernemingsnummer</h3><p>BE 1041.543.042</p><span class="mono"></span></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>AA-Tuinservice · Aaron Annendijck · Student-zelfstandige tuinman · BE 1041.543.042</span>
+    <span>€ 25 per uur · Pajottegem en omstreken</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $("form"), statusEl = $("status"), sendBtn = $("send");
+  var today = new Date();
+  var iso = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-" + String(today.getDate()).padStart(2, "0");
+  var AG = { blocked: [] };
+  try { AG = JSON.parse($("agendaData").textContent); } catch (e) {}
+  var OPEN_DAYS = [0, 3, 4, 5, 6];
+  var selectedISO = "";
+  var now = new Date();
+  var view = { y: now.getFullYear(), m: now.getMonth() };
+  function keyOf(y, m, d) { return y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"); }
+  function isFree(k) {
+    var p = k.split("-"), dt = new Date(+p[0], +p[1] - 1, +p[2]);
+    return k >= iso && OPEN_DAYS.indexOf(dt.getDay()) > -1 && AG.blocked.indexOf(k) < 0;
+  }
+  function renderAgenda() {
+    var grid = $("agGrid"); grid.textContent = "";
+    $("monthName").textContent = new Date(view.y, view.m, 1).toLocaleDateString("nl-BE", { month: "long", year: "numeric" });
+    ["ma", "di", "wo", "do", "vr", "za", "zo"].forEach(function (n) {
+      var h = document.createElement("div"); h.className = "ag-dow"; h.textContent = n; grid.appendChild(h);
+    });
+    var offset = (new Date(view.y, view.m, 1).getDay() + 6) % 7;
+    for (var i = 0; i < offset; i++) { var b = document.createElement("div"); b.className = "ag-blank"; grid.appendChild(b); }
+    var days = new Date(view.y, view.m + 1, 0).getDate();
+    for (var d = 1; d <= days; d++) {
+      var k = keyOf(view.y, view.m, d), btn = document.createElement("button");
+      btn.type = "button"; btn.textContent = d;
+      var label = new Date(view.y, view.m, d).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long" });
+      if (k === selectedISO) { btn.className = "ag-day sel"; btn.setAttribute("aria-pressed", "true"); btn.setAttribute("aria-label", label + ", gekozen"); }
+      else if (isFree(k)) { btn.className = "ag-day free"; btn.setAttribute("aria-label", label + ", vrij"); (function (kk, ll) { btn.addEventListener("click", function () { pick(kk, ll); }); })(k, label); }
+      else { btn.className = "ag-day busy"; btn.disabled = true; btn.setAttribute("aria-label", label + ", niet beschikbaar"); }
+      grid.appendChild(btn);
+    }
+    $("prevM").disabled = view.y === now.getFullYear() && view.m === now.getMonth();
+    $("nextM").disabled = (view.y - now.getFullYear()) * 12 + view.m - now.getMonth() >= 6;
+  }
+  function pick(k, label) {
+    selectedISO = k;
+    var p = k.split("-");
+    $("datum").value = new Date(+p[0], +p[1] - 1, +p[2]).toLocaleDateString("nl-BE", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    renderAgenda();
+  }
+  $("prevM").addEventListener("click", function () { view.m--; if (view.m < 0) { view.m = 11; view.y--; } renderAgenda(); });
+  $("nextM").addEventListener("click", function () { view.m++; if (view.m > 11) { view.m = 0; view.y++; } renderAgenda(); });
+  renderAgenda();
+  function updateEst() {
+    var h = parseFloat($("duur").value);
+    $("est").textContent = h > 0 ? "Richtprijs: € " + (h * 25).toLocaleString("nl-BE", { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + " (btw medecontractant)" : "";
+  }
+  $("duur").addEventListener("input", updateEst);
+  updateEst();
+  $("bonDate").textContent = today.toLocaleDateString("nl-BE", { day: "numeric", month: "long", year: "numeric" });
+
+
+  function summary(d, ref) {
+    return "Referentie: " + ref + "\n" +
+      "Bedrijf: " + d.bedrijf + "\nContact: " + d.contact + " (" + d.tel + ", " + d.mail + ")\n" +
+      "Datum: " + d.datum + " om " + d.start + "\nDuur: " + d.duur + " uur (€ 25 per uur)\nWerf: " + d.werf + "\n" +
+      "Werk: " + (d.werk.length ? d.werk.join(", ") : "niet opgegeven") + "\n" +
+      "Opmerkingen: " + (d.opm || "geen");
+  }
+
+  var lastText = "";
+  function showDone(text) {
+    lastText = text;
+    form.hidden = true;
+    $("ref").textContent = text;
+    $("waSend").href = "https://wa.me/32474183457?text=" + encodeURIComponent("Hallo Aaron, ik wil je graag inboeken.\n\n" + text);
+    $("done").hidden = false;
+    $("done").scrollIntoView({ block: "nearest" });
+  }
+
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var first = form.querySelector(":invalid");
+    if (first) {
+      statusEl.className = "err";
+      statusEl.textContent = "Vul alle verplichte velden in. Controleer ook je e-mailadres en de datum.";
+      first.focus();
+      return;
+    }
+    if (!selectedISO || !isFree(selectedISO)) {
+      statusEl.className = "err";
+      statusEl.textContent = "Kies een vrije dag in de agenda hierboven.";
+      return;
+    }
+    var data = {
+      bedrijf: $("bedrijf").value.trim(), contact: $("contact").value.trim(),
+      tel: $("tel").value.trim(), mail: $("mail").value.trim(),
+      datum: $("datum").value, start: $("start").value, duur: $("duur").value,
+      werf: $("werf").value.trim(), opm: $("opm").value.trim(),
+      werk: Array.prototype.map.call(form.querySelectorAll('input[name="werk"]:checked'), function (c) { return c.value; }),
+      status: "nieuw", aangevraagd: new Date().toISOString()
+    };
+    var id = "b" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    var ref = "WB-" + id.slice(1, 7).toUpperCase();
+    data.ref = ref;
+    statusEl.className = "msg";
+    showDone(summary(data, ref));
+  });
+
+  $("copyBtn").addEventListener("click", function () {
+    var btn = $("copyBtn");
+    function sel() {
+      var r = document.createRange(); r.selectNodeContents($("ref"));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = "Tekst geselecteerd, kopieer zelf";
+    }
+    try { navigator.clipboard.writeText(lastText).then(function () { btn.textContent = "Gekopieerd"; }, sel); } catch (e) { sel(); }
+  });
+
+  $("again").addEventListener("click", function () {
+    form.reset(); $("start").value = "08:00"; updateEst(); selectedISO = ""; renderAgenda();
+    $("copyBtn").textContent = "Kopieer aanvraag";
+    statusEl.className = "msg";
+    statusEl.textContent = "Je vult de gegevens in en verstuurt ze daarna via WhatsApp. Ik bevestig zo snel mogelijk.";
+    $("done").hidden = true; form.hidden = false;
+  });
+})();
+</script>
+</body>
+</html>
